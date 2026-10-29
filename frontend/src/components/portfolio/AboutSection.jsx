@@ -1,0 +1,4 @@
+import {Code2,Database,Network,Sparkles} from 'lucide-react';
+import {SectionTitle} from '../ui/SectionTitle';
+const items=[[Code2,'Développement','Interfaces accessibles et applications robustes.'],[Database,'Données','API REST et bases relationnelles.'],[Network,'Systèmes & réseaux','Infrastructure, Linux et déploiement.'],[Sparkles,'Amélioration continue','Code lisible, apprentissage et résolution de problèmes.']];
+export function AboutSection({profile}){return <section id="about" className="section alternate"><div className="container"><SectionTitle eyebrow="À PROPOS" title="Construire avec méthode et curiosité" description={profile?.about||'J’aime transformer des besoins concrets en solutions numériques claires, performantes et faciles à faire évoluer.'}/><div className="cards four">{items.map(([Icon,title,text])=><article className="card" key={title}><div className="feature-icon"><Icon/></div><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>;}

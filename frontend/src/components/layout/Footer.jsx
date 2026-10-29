@@ -1,0 +1,2 @@
+import {Github,Linkedin,Mail} from 'lucide-react';
+export function Footer(){return <footer className="footer"><div className="container footer-inner"><p>© {new Date().getFullYear()} Portfolio · Réalisé avec React</p><div><a href="https://github.com/" aria-label="GitHub"><Github/></a><a href="https://linkedin.com/" aria-label="LinkedIn"><Linkedin/></a><a href="mailto:contact@example.com" aria-label="E-mail"><Mail/></a></div></div></footer>;}

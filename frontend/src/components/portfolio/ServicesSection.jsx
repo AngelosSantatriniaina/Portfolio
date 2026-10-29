@@ -1,0 +1,6 @@
+import {Code2,Database,ServerCog,Wrench} from 'lucide-react';
+import {useServices} from '../../hooks/usePortfolio';
+import {SectionTitle} from '../ui/SectionTitle';
+const demo=[{title:'Développement web',description:'Applications responsives avec React et Spring Boot.'},{title:'API & bases de données',description:'Conception d’API REST et intégration SQL.'},{title:'Déploiement',description:'Conteneurisation et préparation avec Docker.'},{title:'Support technique',description:'Diagnostic et résolution de problèmes techniques.'}];
+const icons=[Code2,Database,ServerCog,Wrench];
+export function ServicesSection(){const q=useServices();const items=Array.isArray(q.data)&&q.data.length?q.data:demo;return <section id="services" className="section alternate"><div className="container"><SectionTitle eyebrow="CE QUE JE PROPOSE" title="Services" description="Un accompagnement pragmatique, de la conception à la mise en ligne."/><div className="cards four">{items.map((s,i)=>{const Icon=icons[i%icons.length];return <article className="card" key={s.id||s.title}><div className="feature-icon"><Icon/></div><h3>{s.title||s.name}</h3><p>{s.description||s.summary}</p></article>})}</div></div></section>;}
