@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom';
 import {Code2,Menu,X} from 'lucide-react';
 import {useProfile} from '../../hooks/usePortfolio';
 
-const links=[['À propos','#apropos'],['Expérience','#experience'],['Compétences','#competences'],['Services','#services'],['Projets','#projets'],['Galerie','#galerie'],['CV','#cv'],['Contact','#contact']];
+const links=[['À propos','#apropos'],['Expérience','#experience'],['Compétences','#competences'],['Services','#services'],['Projets','#projets'],['CV','#cv'],['Contact','#contact']];
 export function Header(){
  const [open,setOpen]=useState(false);
  const [activeSection,setActiveSection]=useState('');
