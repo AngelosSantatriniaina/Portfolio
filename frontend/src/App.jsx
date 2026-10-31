@@ -58,6 +58,7 @@ function AdminPanel({onClose, onProjectsChanged}) {
 
 export default function App(){
   const [profile,setProfile]=useState(fallbackProfile);const [experiences,setExperiences]=useState(fallbackExperiences);const [skills,setSkills]=useState(fallbackSkills);const [services,setServices]=useState(fallbackServices);const [projects,setProjects]=useState(fallbackProjects);const [adminOpen,setAdminOpen]=useState(false);const [apiState,setApiState]=useState('loading');const [menuHint,setMenuHint]=useState(false);
+  useEffect(()=>{document.title = profile.fullName || 'RANDRIANTSIANALA Santatriniaina Angelos';},[profile.fullName]);
   useEffect(()=>{let live=true;Promise.allSettled([api.get('/api/v1/public/profile'),api.get('/api/v1/public/experiences'),api.get('/api/v1/public/skills'),api.get('/api/v1/public/services'),api.get('/api/v1/public/projects')]).then(results=>{if(!live)return;const setters=[setProfile,setExperiences,setSkills,setServices,setProjects];let ok=0;results.forEach((r,i)=>{if(r.status==='fulfilled'&&r.value){setters[i](r.value);ok++;}});setApiState(ok===5?'online':ok>0?'partial':'offline');});return()=>{live=false;};},[]);
   const skillGroups=useMemo(()=>skills.reduce((acc,s)=>{(acc[s.category||'Autres'] ||= []).push(s);return acc;},{}),[skills]);
   return <><Header profile={profile} onAdmin={()=>setAdminOpen(true)}/><main id="top">
