@@ -4,4 +4,5 @@ import java.util.List;
 
 public interface ContactLinkRepository extends JpaRepository<ContactLink, Long> {
     List<ContactLink> findByPublishedTrueOrderBySortOrderAsc();
+    List<ContactLink> findAllByOrderBySortOrderAsc();
 }

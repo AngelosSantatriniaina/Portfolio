@@ -1,9 +1,42 @@
 import {useState} from 'react';
-import {Mail,MapPin,Send,CheckCircle2} from 'lucide-react';
+import {CheckCircle2,Github,Linkedin,Mail,MapPin,MessageCircle,Send} from 'lucide-react';
 import {SectionTitle} from '../ui/SectionTitle';
 import {useSendContact} from '../../hooks/useContact';
+import {useContactLinks, useProfile} from '../../hooks/usePortfolio';
 import {contactSchema} from '../../schemas/contactSchema';
 import {getErrorMessage} from '../../api/http';
+
 const initial={name:'',email:'',subject:'',message:''};
-export function ContactSection(){const [form,setForm]=useState(initial);const [errors,setErrors]=useState({});const m=useSendContact();const update=e=>setForm({...form,[e.target.name]:e.target.value});async function submit(e){e.preventDefault();const r=contactSchema.safeParse(form);if(!r.success){const es={};r.error.issues.forEach(i=>es[i.path[0]]=i.message);setErrors(es);return;}setErrors({});try{await m.mutateAsync(r.data);setForm(initial);}catch{}}
-return <section id="contact" className="section contact"><div className="container"><SectionTitle eyebrow="CONTACT" title="Parlons de votre projet" description="Une question, une idée ou une opportunité ? Envoyez-moi un message."/><div className="contact-grid"><aside><h3>Créons quelque chose d’utile.</h3><p>Décrivez votre besoin et je vous répondrai dès que possible.</p><div className="contact-detail"><Mail/><div><small>E-mail</small><a href="mailto:contact@example.com">contact@example.com</a></div></div><div className="contact-detail"><MapPin/><div><small>Localisation</small><span>Madagascar · À distance</span></div></div></aside><form className="form" onSubmit={submit} noValidate><div className="form-row">{[['name','Nom complet','Votre nom'],['email','E-mail','vous@exemple.com']].map(([n,l,p])=><label key={n}>{l}<input name={n} value={form[n]} onChange={update} placeholder={p} type={n==='email'?'email':'text'}/>{errors[n]&&<small className="error">{errors[n]}</small>}</label>)}</div><label>Sujet<input name="subject" value={form.subject} onChange={update} placeholder="Objet du message"/>{errors.subject&&<small className="error">{errors.subject}</small>}</label><label>Message<textarea name="message" rows="5" value={form.message} onChange={update} placeholder="Parlez-moi de votre projet…"/>{errors.message&&<small className="error">{errors.message}</small>}</label>{m.isSuccess&&<p className="success"><CheckCircle2/> Message envoyé avec succès.</p>}{m.isError&&<p className="error">{getErrorMessage(m.error,'Échec de l’envoi du message.')}</p>}<button className="button primary" disabled={m.isPending}>{m.isPending?'Envoi…':'Envoyer le message'} <Send/></button></form></div></div></section>;}
+const icons={github:Github,linkedin:Linkedin,mail:Mail,'message-circle':MessageCircle,whatsapp:MessageCircle};
+
+export function ContactSection(){
+ const [form,setForm]=useState(initial);
+ const [errors,setErrors]=useState({});
+ const mutation=useSendContact();
+ const profile=useProfile();
+ const links=useContactLinks();
+ const contactLinks=(links.data||[]).filter(link=>link.url.toLowerCase()!==`mailto:${profile.data?.email||''}`.toLowerCase());
+ const update=event=>setForm({...form,[event.target.name]:event.target.value});
+ async function submit(event){
+  event.preventDefault();
+  const result=contactSchema.safeParse(form);
+  if(!result.success){const next={};result.error.issues.forEach(issue=>next[issue.path[0]]=issue.message);setErrors(next);return;}
+  setErrors({});
+  try{await mutation.mutateAsync(result.data);setForm(initial);}catch{}
+ }
+ return <section id="contact" className="section contact"><div className="container">
+  <SectionTitle eyebrow="Échangeons" title="Me contacter" description="Un poste, une mission, une formation ou une application à développer ? Écrivez-moi, je réponds sous 24 h."/>
+  <div className="contact-grid"><aside><h3>Créons quelque chose d’utile.</h3><p>Décrivez votre besoin et je vous répondrai dès que possible.</p>
+   {profile.data?.email&&<div className="contact-detail"><Mail/><div><small>E-mail</small><a href={`mailto:${profile.data.email}`}>{profile.data.email}</a></div></div>}
+   {profile.data?.location&&<div className="contact-detail"><MapPin/><div><small>Localisation</small><span>{profile.data.location}</span></div></div>}
+   {contactLinks.map(link=>{const Icon=icons[link.icon?.toLowerCase()]||Mail;return <div className="contact-detail" key={link.id}><Icon/><div><small>{link.label}</small><a href={link.url} target={link.url.startsWith('http')?'_blank':undefined} rel={link.url.startsWith('http')?'noreferrer':undefined}>{link.url}</a></div></div>;})}
+  </aside><form className="form" onSubmit={submit} noValidate>
+   <div className="form-row">{[['name','Nom complet','Votre nom'],['email','E-mail','vous@exemple.com']].map(([name,label,placeholder])=><label key={name}>{label}<input name={name} value={form[name]} onChange={update} placeholder={placeholder} type={name==='email'?'email':'text'}/>{errors[name]&&<small className="error">{errors[name]}</small>}</label>)}</div>
+   <label>Sujet<input name="subject" value={form.subject} onChange={update} placeholder="Objet du message"/>{errors.subject&&<small className="error">{errors.subject}</small>}</label>
+   <label>Message<textarea name="message" rows="5" value={form.message} onChange={update} placeholder="Parlez-moi de votre projet…"/>{errors.message&&<small className="error">{errors.message}</small>}</label>
+   {mutation.isSuccess&&<p className="success"><CheckCircle2/> Message envoyé avec succès.</p>}
+   {mutation.isError&&<p className="error">{getErrorMessage(mutation.error,'Échec de l’envoi du message.')}</p>}
+   <button className="button primary" disabled={mutation.isPending}>{mutation.isPending?'Envoi…':'Envoyer le message'} <Send/></button>
+  </form></div>
+ </div></section>;
+}

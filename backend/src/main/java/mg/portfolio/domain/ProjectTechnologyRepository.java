@@ -4,4 +4,5 @@ import java.util.List;
 
 public interface ProjectTechnologyRepository extends JpaRepository<ProjectTechnology, Long> {
     List<ProjectTechnology> findByProjectIdOrderByIdAsc(Long projectId);
+    void deleteByProjectId(Long projectId);
 }

@@ -5,4 +5,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface ContactMessageRepository extends JpaRepository<ContactMessage, Long> {
     Page<ContactMessage> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    java.util.List<ContactMessage> findAllByOrderByCreatedAtDesc();
 }

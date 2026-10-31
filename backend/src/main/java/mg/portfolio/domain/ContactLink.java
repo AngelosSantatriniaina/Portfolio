@@ -11,4 +11,10 @@ public class ContactLink {
  protected ContactLink() {}
  public Long getId(){return id;} public String getLabel(){return label;} public String getUrl(){return url;} public String getIcon(){return icon;}
  public int getSortOrder(){return sortOrder;} public boolean isPublished(){return published;}
+ public ContactLink(String label,String url,String icon,int sortOrder,boolean published){
+  this.label=label;this.url=url;this.icon=icon;this.sortOrder=sortOrder;this.published=published;
+ }
+ public void update(String label,String url,String icon,int sortOrder,boolean published){
+  this.label=label;this.url=url;this.icon=icon;this.sortOrder=sortOrder;this.published=published;
+ }
 }

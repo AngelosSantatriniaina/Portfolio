@@ -8,4 +8,6 @@ public class SkillCategory {
  @Column(nullable=false) private boolean published=true;
  protected SkillCategory() {}
  public Long getId(){return id;} public String getName(){return name;} public int getSortOrder(){return sortOrder;} public boolean isPublished(){return published;}
+ public SkillCategory(String name,int sortOrder,boolean published){this.name=name;this.sortOrder=sortOrder;this.published=published;}
+ public void update(String name,int sortOrder,boolean published){this.name=name;this.sortOrder=sortOrder;this.published=published;}
 }
