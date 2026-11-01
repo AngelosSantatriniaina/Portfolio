@@ -1,0 +1,30 @@
+# Fichiers sensibles
+.env
+.env.*
+!.env.example
+
+# Environnements Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Configuration locale des agents IA
+.agents/
+skills-lock.json
+.vscode/mcp.json
+
+# Dépendances Node.js
+node_modules/
+
+# Builds
+dist/
+build/
+target/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
