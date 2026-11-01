@@ -19,17 +19,22 @@ public class AuthController {
     private final JwtService jwt;
     private final SecurityProperties props;
 
-    public AuthController(AdminUserRepository admins, PasswordEncoder encoder, JwtService jwt, SecurityProperties props) {
-        this.admins = admins; this.encoder = encoder; this.jwt = jwt; this.props = props;
+    public AuthController(AdminUserRepository admins, PasswordEncoder encoder, JwtService jwt,
+            SecurityProperties props) {
+        this.admins = admins;
+        this.encoder = encoder;
+        this.jwt = jwt;
+        this.props = props;
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         var admin = admins.findByEmailIgnoreCase(request.email().trim())
                 .filter(a -> encoder.matches(request.password(), a.getPasswordHash()))
-                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("Identifiants invalides"));
+                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException(
+                        "Identifiants invalides"));
         ResponseCookie cookie = ResponseCookie.from(props.cookieName(), jwt.createToken(admin.getEmail()))
-                .httpOnly(true).secure(props.cookieSecure()).sameSite("Lax").path("/")
+                .httpOnly(true).secure(props.cookieSecure()).sameSite("None").path("/")
                 .maxAge(props.jwtTtlMinutes() * 60).build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(java.util.Map.of("email", admin.getEmail(), "role", "ADMIN"));
@@ -38,7 +43,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         ResponseCookie cookie = ResponseCookie.from(props.cookieName(), "").httpOnly(true)
-                .secure(props.cookieSecure()).sameSite("Lax").path("/").maxAge(0).build();
+                .secure(props.cookieSecure()).sameSite("None").path("/").maxAge(0).build();
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
 
