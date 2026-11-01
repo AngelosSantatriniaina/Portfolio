@@ -21,29 +21,52 @@ import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@EnableConfigurationProperties({SecurityProperties.class, AdminProperties.class, UploadProperties.class})
+@EnableConfigurationProperties({ SecurityProperties.class, AdminProperties.class, UploadProperties.class })
 public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
         var csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrfRepo.setCookiePath("/");
+
         var csrfHandler = new CsrfTokenRequestAttributeHandler();
+
         http
-            .cors(Customizer.withDefaults())
-            .csrf(csrf -> csrf.csrfTokenRepository(csrfRepo).csrfTokenRequestHandler(csrfHandler)
-                .ignoringRequestMatchers("/actuator/health"))
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .formLogin(f -> f.disable())
-            .httpBasic(b -> b.disable())
-            .logout(l -> l.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/health", "/actuator/info", "/api/v1/public/**",
-                                 "/api/v1/auth/login", "/api/v1/auth/logout", "/api/v1/auth/csrf",
-                                 "/api/v1/contact", "/uploads/**").permitAll()
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .anyRequest().denyAll())
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .cors(Customizer.withDefaults())
+
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(csrfRepo)
+                        .csrfTokenRequestHandler(csrfHandler)
+                        .ignoringRequestMatchers(
+                                "/actuator/health",
+                                "/actuator/health/**"))
+
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .formLogin(f -> f.disable())
+                .httpBasic(b -> b.disable())
+                .logout(l -> l.disable())
+
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/actuator/health",
+                                "/actuator/health/**",
+                                "/actuator/info",
+                                "/api/v1/public/**",
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/logout",
+                                "/api/v1/auth/csrf",
+                                "/api/v1/contact",
+                                "/uploads/**")
+                        .permitAll()
+
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        .anyRequest().denyAll())
+
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -60,5 +83,8 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(12); }
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);
+    }
 }
