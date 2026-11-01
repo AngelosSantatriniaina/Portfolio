@@ -24,9 +24,18 @@ import java.util.List;
 @EnableConfigurationProperties({ SecurityProperties.class, AdminProperties.class, UploadProperties.class })
 public class SecurityConfig {
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter , SecurityProperties props) throws Exception {
+        // Repository du jeton CSRF.
+        // HttpOnly=false permet au navigateur d'accéder au cookie si nécessaire.
         var csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+
+        // Le cookie est disponible sur toutes les routes.
         csrfRepo.setCookiePath("/");
+
+        // Configuration adaptée à l'environnement.
+        csrfRepo.setCookieCustomizer(cookie -> cookie
+                .sameSite(props.cookieSecure() ? "None" : "Lax")
+                .secure(props.cookieSecure()));
 
         var csrfHandler = new CsrfTokenRequestAttributeHandler();
 
