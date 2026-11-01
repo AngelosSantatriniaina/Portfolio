@@ -42,6 +42,9 @@ management:
       probes:
         enabled: true
       show-components: always  
+      health:
+  mail:
+    enabled: false 
 app:
   security:
     jwt-secret-base64: ${JWT_SECRET_BASE64:}
