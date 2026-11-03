@@ -21,7 +21,12 @@ import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@EnableConfigurationProperties({ SecurityProperties.class, AdminProperties.class, UploadProperties.class })
+@EnableConfigurationProperties({
+        SecurityProperties.class,
+        AdminProperties.class,
+        UploadProperties.class,
+        SupabaseStorageProperties.class
+})
 public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter , SecurityProperties props) throws Exception {

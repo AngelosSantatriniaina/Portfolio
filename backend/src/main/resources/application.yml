@@ -55,8 +55,16 @@ app:
   admin:
     email: ${ADMIN_EMAIL:}
     password: ${ADMIN_PASSWORD:}
+  
   uploads:
     directory: ${UPLOAD_DIR:./uploads}
+
+  supabase:
+    storage:
+      url: ${SUPABASE_URL:}
+      secret-key: ${SUPABASE_SECRET_KEY:}
+      bucket: ${SUPABASE_STORAGE_BUCKET:portfolio-images}
+
   contact:
     to: ${CONTACT_TO:angelossantatriniaina@gmail.com}
     from: ${MAIL_FROM:no-reply@example.com}
