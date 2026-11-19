@@ -2,6 +2,7 @@ package mg.portfolio.api;
 
 import jakarta.validation.Valid;
 import mg.portfolio.api.dto.*;
+import mg.portfolio.storage.PublicImageUrlResolver;
 import mg.portfolio.common.ResourceNotFoundException;
 import mg.portfolio.domain.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,11 +22,13 @@ public class AdminContentController {
     private final ContactLinkRepository contactLinks;
     private final ReviewRepository reviews;
     private final ContactMessageRepository messages;
+    private final PublicImageUrlResolver imageUrls;
 
-    public AdminContentController(ProfileRepository profiles, AboutItemRepository aboutItems, ExperienceRepository experiences, SkillRepository skills,
-                                  SkillCategoryRepository skillCategories, PortfolioServiceRepository services,
-                                  ContactLinkRepository contactLinks, ReviewRepository reviews,
-                                  ContactMessageRepository messages) {
+    public AdminContentController(ProfileRepository profiles, AboutItemRepository aboutItems,
+            ExperienceRepository experiences, SkillRepository skills,
+            SkillCategoryRepository skillCategories, PortfolioServiceRepository services,
+            ContactLinkRepository contactLinks, ReviewRepository reviews,
+            ContactMessageRepository messages, PublicImageUrlResolver imageUrls) {
         this.profiles = profiles;
         this.aboutItems = aboutItems;
         this.experiences = experiences;
@@ -35,11 +38,13 @@ public class AdminContentController {
         this.contactLinks = contactLinks;
         this.reviews = reviews;
         this.messages = messages;
+        this.imageUrls = imageUrls;
     }
 
     @GetMapping("/profile")
     public ProfileDto profile() {
-        return profiles.findById(1L).map(ProfileDto::from)
+        return profiles.findById(1L)
+                .map(p -> ProfileDto.from(p, imageUrls))
                 .orElseThrow(() -> new ResourceNotFoundException("Profil non configuré"));
     }
 
@@ -47,10 +52,19 @@ public class AdminContentController {
     public ProfileDto updateProfile(@Valid @RequestBody AdminProfileRequest request) {
         Profile profile = profiles.findById(1L)
                 .orElseThrow(() -> new ResourceNotFoundException("Profil non configuré"));
-        profile.update(request.fullName().trim(), request.headline().trim(), blankToNull(request.bio()),
-                blankToNull(request.location()), blankToNull(request.email()), blankToNull(request.githubUrl()),
-                blankToNull(request.linkedinUrl()), blankToNull(request.whatsappUrl()), blankToNull(request.portraitPath()));
-        return ProfileDto.from(profiles.save(profile));
+
+        profile.update(
+                request.fullName().trim(),
+                request.headline().trim(),
+                blankToNull(request.bio()),
+                blankToNull(request.location()),
+                blankToNull(request.email()),
+                blankToNull(request.githubUrl()),
+                blankToNull(request.linkedinUrl()),
+                blankToNull(request.whatsappUrl()),
+                blankToNull(request.portraitPath()));
+
+        return ProfileDto.from(profiles.save(profile), imageUrls);
     }
 
     @GetMapping("/about-items")
@@ -90,10 +104,12 @@ public class AdminContentController {
     }
 
     @PutMapping("/experiences/{id}")
-    public AdminExperienceDto updateExperience(@PathVariable Long id, @Valid @RequestBody AdminExperienceRequest request) {
+    public AdminExperienceDto updateExperience(@PathVariable Long id,
+            @Valid @RequestBody AdminExperienceRequest request) {
         Experience item = experiences.findById(id).orElseThrow(() -> notFound("Expérience", id));
         item.update(request.title().trim(), blankToNull(request.organization()), blankToNull(request.location()),
-                blankToNull(request.period()), blankToNull(request.summary()), request.sortOrder(), request.published());
+                blankToNull(request.period()), blankToNull(request.summary()), request.sortOrder(),
+                request.published());
         return AdminExperienceDto.from(experiences.save(item));
     }
 
@@ -117,7 +133,8 @@ public class AdminContentController {
     @PutMapping("/skills/{id}")
     public AdminSkillDto updateSkill(@PathVariable Long id, @Valid @RequestBody AdminSkillRequest request) {
         Skill item = skills.findById(id).orElseThrow(() -> notFound("Compétence", id));
-        item.update(resolveCategory(request.category()), request.name().trim(), request.sortOrder(), request.level(), request.published());
+        item.update(resolveCategory(request.category()), request.name().trim(), request.sortOrder(), request.level(),
+                request.published());
         return AdminSkillDto.from(skills.save(item));
     }
 
@@ -139,7 +156,8 @@ public class AdminContentController {
 
     @PutMapping("/skill-categories/{id}")
     @Transactional
-    public AdminSkillCategoryDto updateSkillCategory(@PathVariable Long id, @Valid @RequestBody AdminSkillCategoryRequest request) {
+    public AdminSkillCategoryDto updateSkillCategory(@PathVariable Long id,
+            @Valid @RequestBody AdminSkillCategoryRequest request) {
         SkillCategory category = skillCategories.findById(id).orElseThrow(() -> notFound("Catégorie", id));
         category.update(request.name().trim(), request.sortOrder(), request.published());
         return AdminSkillCategoryDto.from(skillCategories.save(category));
@@ -190,7 +208,8 @@ public class AdminContentController {
     }
 
     @PutMapping("/contact-links/{id}")
-    public AdminContactLinkDto updateContactLink(@PathVariable Long id, @Valid @RequestBody AdminContactLinkRequest request) {
+    public AdminContactLinkDto updateContactLink(@PathVariable Long id,
+            @Valid @RequestBody AdminContactLinkRequest request) {
         ContactLink item = contactLinks.findById(id).orElseThrow(() -> notFound("Lien de contact", id));
         item.update(request.label().trim(), request.url().trim(), blankToNull(request.icon()),
                 request.sortOrder(), request.published());

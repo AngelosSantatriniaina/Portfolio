@@ -15,3 +15,7 @@ app:
   admin:
     email: test-admin@example.test
     password: test-admin-password-123
+  supabase:
+    storage:
+      url: https://test.supabase.co
+      bucket: portfolio-images
