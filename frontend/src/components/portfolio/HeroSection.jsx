@@ -1,11 +1,22 @@
+import {useEffect,useRef,useState} from 'react';
 import {ArrowRight,MapPin} from 'lucide-react';
 import {assetUrl} from '../../api/http';
 
 export function HeroSection({profile}) {
+  const heroRef=useRef(null);
+  const [isVisible,setIsVisible]=useState(false);
   const name = profile?.fullName || 'Portfolio';
   const portraitUrl = assetUrl(profile?.portraitPath);
   const headline = profile?.headline || 'Développeur Java Fullstack / Administrateur Systèmes & Réseaux';
-  return <section id="top" className="hero"><div className="hero-grid-lines" aria-hidden="true"/>
+  useEffect(()=>{
+    const hero=heroRef.current;
+    if(!hero)return undefined;
+    if(!('IntersectionObserver' in window)){setIsVisible(true);return undefined;}
+    const observer=new IntersectionObserver(([entry])=>setIsVisible(entry.isIntersecting),{threshold:.15});
+    observer.observe(hero);
+    return ()=>observer.disconnect();
+  },[]);
+  return <section ref={heroRef} id="top" className={isVisible?'hero hero-visible':'hero'}><div className="hero-grid-lines" aria-hidden="true"/>
     <div className="hero-glow" aria-hidden="true"/>
     <div className="container hero-grid"><div className="hero-copy">
       <p className="eyebrow">Ingénierie logicielle &amp; infrastructure</p>
