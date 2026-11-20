@@ -7,7 +7,7 @@ import {assetUrl} from '../../api/http';
 const links=[['À propos','#apropos'],['Expérience','#experience'],['Compétences','#competences'],['Services','#services'],['Projets','#projets'],['CV','#cv'],['Contact','#contact']];
 export function Header(){
  const [open,setOpen]=useState(false);
- const [theme,setTheme]=useState(()=>localStorage.getItem('portfolio-theme')||'system');
+ const [theme,setTheme]=useState(()=>localStorage.getItem('portfolio-theme')||'light');
  const [effectiveTheme,setEffectiveTheme]=useState(()=>window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
  const [activeSection,setActiveSection]=useState('');
  const {data:profile}=useProfile();
